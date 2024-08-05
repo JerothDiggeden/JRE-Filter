@@ -1,6 +1,9 @@
 import requests
 from icecream import ic
+import streamlit as st
 
+
+# col1, col2 = st.columns(2)
 
 url = "https://spotify23.p.rapidapi.com/podcast_episodes/"
 
@@ -45,15 +48,24 @@ for episode in response['data']['podcastUnionV2']['episodesV2']['items']:
 				break  # Stop searching in this episode's description after finding the keyword
 
 
-# for episode in response['data']['podcastUnionV2']['episodesV2']['items']:
-# 	if ep_code in episode['entity']['data']['uri']:
-# 		episodes_dsc.append(episode['entity']['data']['description'])
-
+# for i, code in enumerate(episodes_lst.copy()):
+# 	episodes_lst[i] = code[16:]
 
 ic(episodes_lst)
-ic(episodes_dsc)
 
-# for k, item in enumerate(response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']):
-# 	if item == 'description':
-# 		if keyword in item['description']:
-# 			ic(response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity'][episodes[k]])
+episodes_dict = {}
+
+for uri in response['data']['podcastUnionV2']['episodesV2']['items']:
+	if 'entity' in uri:
+		count = 0
+		ic(uri)
+		if uri['entity']['_uri'] in episodes_lst:
+			ic(uri)
+			entity_data = uri['entity']['data']['description']
+			episodes_dict[uri['entity']['data']['name']] = entity_data
+		count += 1
+
+ic(episodes_dict)
+
+# with col1:
+# 	st.title('JRE Spotify Episodes')
