@@ -2,8 +2,10 @@ import requests
 from icecream import ic
 import streamlit as st
 
-st.title('JRE Spotify Episodes')
-col1, col2 = st.columns(2)
+
+st.set_page_config(page_title=None, page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
+# Define the column layout
+col1, col2, col3 = st.columns([2, 2, 2])
 
 url = "https://spotify23.p.rapidapi.com/podcast_episodes/"
 
@@ -24,32 +26,25 @@ keyword = ['Patrick', 'Doblin', 'Stamets', 'Hancock', 'Carlson', 'Trussell',
 		   'Degrass', 'Kaku', 'Ryan', 'Weinstein', 'Peterson', 'Musk',
 		   'Shapiro', 'Harris', 'Rubin', 'UFO', 'UAP', 'Nutrition', 'Hunting', 'Psychedelic', 'PHD',
 		   'Masters', 'Author', 'Anthropology', 'Archeology', 'Biology', 'Musician']
+
 episodes_lst = []
 episodes_dsc = []
 
 ic(response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['description'])
 
 for episode in response['data']['podcastUnionV2']['episodesV2']['items']:
-	# Check if 'entity' key exists in the current episode
+
 	if 'entity' in episode:
 		entity_data = episode['entity']['data']
 
-		# Get the episode's URI
 		ep_code = entity_data.get('uri', '')
 
-		# Get the description and split it into words
 		description = entity_data.get('description', '').split()
 
-		# Iterate over the words in the description
 		for word in description:
 			if word in keyword:
-				# Append the URI to the list if the keyword is found
 				episodes_lst.append(ep_code)
-				break  # Stop searching in this episode's description after finding the keyword
-
-
-# for i, code in enumerate(episodes_lst.copy()):
-# 	episodes_lst[i] = code[16:]
+				break
 
 ic(episodes_lst)
 
@@ -71,11 +66,32 @@ for uri in response['data']['podcastUnionV2']['episodesV2']['items']:
 ep_links = []
 
 with (col1):
+	st.title('JRE Filter')
+
+
+with col2:
+	latest_name = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['name']
+	latest_desc = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['description']
+	latest_html = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['sharingInfo'][
+		'shareUrl']
+
+	length = len(episodes_lst)
+	latest_filtered = episodes_lst[length - 1]
+	latest_filtered = f"https://open.spotify.com/episode/{latest_filtered[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
+	ic(episodes_lst)
+	ic(latest_filtered)
+
+	st.title('Latest Episode: ')
+	st.page_link(latest_html, label=latest_name)
+
+with col3:
+	st.title('Latest Filtered Episode: ')
+
+	st.page_link(latest_filtered, label=latest_name)
+
+	st.title('Old Filtered Episodes: ')
+
 	for i, link in enumerate(episodes_lst):
 		html = f"https://open.spotify.com/episode/{link[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
 		st.page_link(html, label=episode_names[i])
 		ep_links.append(html)
-		# for label in response['data']['podcastUnionV2']['episodesV2']['items']:
-		# 	if 'entity' in label:
-		# 		if label['entity']['_uri'] in episodes_lst:
-
