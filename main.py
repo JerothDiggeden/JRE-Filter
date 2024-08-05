@@ -17,9 +17,9 @@ ic(response.json())
 
 response = response.json()
 ic(response)
-keyword = ['Dr Rhonda Patrick', 'Rick Doblin', 'Paul Stamets', 'Graham Hancock', 'Randal Carlson', 'Duncan Trussel',
-		   'Neil Degrass Tyson', 'Dr Michio Kaku', 'Christopher Ryan', 'Weinstein', 'Jordan Peterson', 'Elon Musk',
-		   'Ben Shapiro', 'Sam Harris', 'Dave Rubin', 'UFO', 'UAP', 'Nutrition', 'Hunting', 'Psychedelic', 'PHD',
+keyword = ['Patrick', 'Doblin', 'Stamets', 'Hancock', 'Carlson', 'Trussell',
+		   'Degrass', 'Kaku', 'Ryan', 'Weinstein', 'Peterson', 'Musk',
+		   'Shapiro', 'Harris', 'Rubin', 'UFO', 'UAP', 'Nutrition', 'Hunting', 'Psychedelic', 'PHD',
 		   'Masters', 'Author', 'Anthropology', 'Archeology', 'Biology', 'Musician']
 episodes_lst = []
 episodes_dsc = []
