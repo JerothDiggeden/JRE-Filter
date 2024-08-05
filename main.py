@@ -2,8 +2,8 @@ import requests
 from icecream import ic
 import streamlit as st
 
-
-# col1, col2 = st.columns(2)
+st.title('JRE Spotify Episodes')
+col1, col2 = st.columns(2)
 
 url = "https://spotify23.p.rapidapi.com/podcast_episodes/"
 
@@ -54,6 +54,7 @@ for episode in response['data']['podcastUnionV2']['episodesV2']['items']:
 ic(episodes_lst)
 
 episodes_dict = {}
+episode_names = []
 
 for uri in response['data']['podcastUnionV2']['episodesV2']['items']:
 	if 'entity' in uri:
@@ -63,9 +64,18 @@ for uri in response['data']['podcastUnionV2']['episodesV2']['items']:
 			ic(uri)
 			entity_data = uri['entity']['data']['description']
 			episodes_dict[uri['entity']['data']['name']] = entity_data
+			episode_names.append(uri['entity']['data']['name'])
+			uri = uri
 		count += 1
 
-ic(episodes_dict)
+ep_links = []
 
-# with col1:
-# 	st.title('JRE Spotify Episodes')
+with (col1):
+	for i, link in enumerate(episodes_lst):
+		html = f"https://open.spotify.com/episode/{link[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
+		st.page_link(html, label=episode_names[i])
+		ep_links.append(html)
+		# for label in response['data']['podcastUnionV2']['episodesV2']['items']:
+		# 	if 'entity' in label:
+		# 		if label['entity']['_uri'] in episodes_lst:
+
