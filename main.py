@@ -4,7 +4,7 @@ import streamlit as st
 
 
 st.set_page_config(page_title=None, page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
-# Define the column layout
+
 col1, col2 = st.columns([1, 2])
 
 url = "https://spotify23.p.rapidapi.com/podcast_episodes/"
