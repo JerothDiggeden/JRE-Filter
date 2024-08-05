@@ -5,7 +5,7 @@ import streamlit as st
 
 st.set_page_config(page_title=None, page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
 # Define the column layout
-col1, col2, col3 = st.columns([2, 2, 2])
+col1, col2 = st.columns([1, 2])
 
 url = "https://spotify23.p.rapidapi.com/podcast_episodes/"
 
@@ -18,10 +18,8 @@ headers = {
 
 response = requests.get(url, headers=headers, params=querystring)
 
-ic(response.json())
-
 response = response.json()
-ic(response)
+
 keyword = ['Patrick', 'Doblin', 'Stamets', 'Hancock', 'Carlson', 'Trussell',
 		   'Degrass', 'Kaku', 'Ryan', 'Weinstein', 'Peterson', 'Musk',
 		   'Shapiro', 'Harris', 'Rubin', 'UFO', 'UAP', 'Nutrition', 'Hunting', 'Psychedelic', 'PHD',
@@ -29,8 +27,6 @@ keyword = ['Patrick', 'Doblin', 'Stamets', 'Hancock', 'Carlson', 'Trussell',
 
 episodes_lst = []
 episodes_dsc = []
-
-ic(response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['description'])
 
 for episode in response['data']['podcastUnionV2']['episodesV2']['items']:
 
@@ -46,15 +42,12 @@ for episode in response['data']['podcastUnionV2']['episodesV2']['items']:
 				episodes_lst.append(ep_code)
 				break
 
-ic(episodes_lst)
-
 episodes_dict = {}
 episode_names = []
 
 for uri in response['data']['podcastUnionV2']['episodesV2']['items']:
 	if 'entity' in uri:
 		count = 0
-		ic(uri)
 		if uri['entity']['_uri'] in episodes_lst:
 			ic(uri)
 			entity_data = uri['entity']['data']['description']
@@ -66,30 +59,32 @@ for uri in response['data']['podcastUnionV2']['episodesV2']['items']:
 ep_links = []
 
 with (col1):
-	st.title('JRE Filter')
+	pic = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['podcastV2']['data']['coverArt']['sources'][1]['url']
+	pic2 = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['coverArt']['sources'][1]['url']
+	pic3 = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['coverArt']['sources'][1]['url']
+	st.title('My JRE Filter')
+	st.image(pic, caption='JRE Filter', use_column_width=False)
 
 
 with col2:
 	latest_name = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['name']
 	latest_desc = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['description']
-	latest_html = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['sharingInfo'][
-		'shareUrl']
+	latest_html = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['sharingInfo']['shareUrl']
 
 	length = len(episodes_lst)
 	latest_filtered = episodes_lst[length - 1]
 	latest_filtered = f"https://open.spotify.com/episode/{latest_filtered[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
-	ic(episodes_lst)
-	ic(latest_filtered)
 
 	st.title('Latest Episode: ')
+	st.image(pic2, caption='JRE Filter', use_column_width=False)
 	st.page_link(latest_html, label=latest_name)
 
-with col3:
-	st.title('Latest Filtered Episode: ')
+	st.title('Filtered Episode: ')
+	st.image(pic3, caption='JRE Filter', use_column_width=False)
 
 	st.page_link(latest_filtered, label=latest_name)
 
-	st.title('Old Filtered Episodes: ')
+	st.title('Old Episodes: ')
 
 	for i, link in enumerate(episodes_lst):
 		html = f"https://open.spotify.com/episode/{link[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
