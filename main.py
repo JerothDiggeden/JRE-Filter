@@ -4,7 +4,7 @@ import streamlit as st
 
 
 st.set_page_config(page_title="Episodes", page_icon=":material/edit:", layout="wide",
-				   initial_sidebar_state="expanded")
+				   initial_sidebar_state="collapsed")
 
 col1, col2 = st.columns([1, 2])
 
