@@ -69,8 +69,11 @@ for k in response:
 
 for l in response:
 	if 'entity' in k:
-		if k['entity']['_uri'] == episodes_lst[0]:
-			latest_desc = k['entity']['data']['description']
+		try:
+			if k['entity']['_uri'] == episodes_lst[0]:
+				latest_desc = k['entity']['data']['description']
+		except IndexError:
+			continue
 
 
 def update_content(value):
@@ -84,6 +87,23 @@ def add():
 	with open('data/filter.txt', 'w') as file:
 		for word in keyword:
 			file.writelines(word + "\n")
+
+
+def sub():
+	global add_txt
+	sub_word = st.session_state.sub_txt
+	keyword.remove(sub_word)
+	with open('data/filter.txt', 'w') as file:
+		for word in keyword:
+			file.writelines(word + "\n")
+
+
+def clear():
+	keyword.clear()
+	keyword.append("")
+	with open('data/filter.txt', 'w') as file:
+		for word in keyword:
+			file.writelines(word)
 
 
 # PAGE LAYOUT
@@ -102,16 +122,20 @@ with st.sidebar:
 	st.image(pic, use_column_width=False)
 	st.title('Filter: ')
 	add_txt = st.text_input(key='add_txt', label='Add Filter', placeholder='Enter a New Filter Word', on_change=add)
+	sub_txt = st.text_input(key='sub_txt', label='Remove Filter', placeholder='Enter a Filter Word to Remove', on_change=sub)
+	clear = st.button('Clear', key='clear', on_click=clear)
 	st.write(keyword)
 
 with col1:
 	latest_name = response[0]['entity']['data']['name']
 	latest_desc = response[0]['entity']['data']['description']
 	latest_html = response[0]['entity']['data']['sharingInfo']['shareUrl']
-
-	length = len(episodes_lst)
-	latest_filtered = episodes_lst[length - 1]
-	latest_filtered = f"https://open.spotify.com/episode/{latest_filtered[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
+	try:
+		length = len(episodes_lst)
+		latest_filtered = episodes_lst[length - 1]
+		latest_filtered = f"https://open.spotify.com/episode/{latest_filtered[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
+	except IndexError:
+		print("Index Error")
 
 	st.title('Latest Episode: ')
 	st.image(pic2, use_column_width=False)
@@ -120,9 +144,15 @@ with col1:
 
 	st.title('Filtered Episode: ')
 	st.image(pic3, use_column_width=False)
-	st.write(descriptions[0])
+	try:
+		st.write(descriptions[0])
+	except IndexError:
+		print("Index Error")
 
-	st.page_link(latest_filtered, label=latest_name)
+	try:
+		st.page_link(latest_filtered, label=latest_name)
+	except NameError:
+		print("Name Error")
 
 	st.title('Old Episodes: ')
 
