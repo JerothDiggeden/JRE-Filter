@@ -86,7 +86,6 @@ def add():
 			file.writelines(word + "\n")
 
 
-
 # PAGE LAYOUT
 ep_links = []
 
