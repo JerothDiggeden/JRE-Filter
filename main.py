@@ -27,8 +27,9 @@ keyword = ['Patrick', 'Doblin', 'Stamets', 'Hancock', 'Carlson', 'Trussell',
 
 episodes_lst = []
 episodes_dsc = []
+response = response['data']['podcastUnionV2']['episodesV2']['items']
 
-for episode in response['data']['podcastUnionV2']['episodesV2']['items']:
+for episode in response:
 
 	if 'entity' in episode:
 		entity_data = episode['entity']['data']
@@ -45,7 +46,7 @@ for episode in response['data']['podcastUnionV2']['episodesV2']['items']:
 episodes_dict = {}
 episode_names = []
 
-for uri in response['data']['podcastUnionV2']['episodesV2']['items']:
+for uri in response:
 	if 'entity' in uri:
 		count = 0
 		if uri['entity']['_uri'] in episodes_lst:
@@ -56,31 +57,41 @@ for uri in response['data']['podcastUnionV2']['episodesV2']['items']:
 			uri = uri
 		count += 1
 
+descriptions = []
+
+for k in response:
+	if 'entity' in k:
+		if k['entity']['_uri'] in episodes_lst:
+			descriptions.append(k['entity']['data']['description'])
+
 ep_links = []
+ic(descriptions)
 
 with (col1):
-	pic = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['podcastV2']['data']['coverArt']['sources'][1]['url']
-	pic2 = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['coverArt']['sources'][1]['url']
-	pic3 = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['coverArt']['sources'][1]['url']
+	pic = response[0]['entity']['data']['podcastV2']['data']['coverArt']['sources'][1]['url']
+	pic2 = response[0]['entity']['data']['coverArt']['sources'][1]['url']
+	pic3 = response[0]['entity']['data']['coverArt']['sources'][1]['url']
 	st.title('My JRE Filter')
-	st.image(pic, caption='JRE Filter', use_column_width=False)
+	st.image(pic, use_column_width=False)
 
 
 with col2:
-	latest_name = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['name']
-	latest_desc = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['description']
-	latest_html = response['data']['podcastUnionV2']['episodesV2']['items'][0]['entity']['data']['sharingInfo']['shareUrl']
+	latest_name = response[0]['entity']['data']['name']
+	latest_desc = response[0]['entity']['data']['description']
+	latest_html = response[0]['entity']['data']['sharingInfo']['shareUrl']
 
 	length = len(episodes_lst)
 	latest_filtered = episodes_lst[length - 1]
 	latest_filtered = f"https://open.spotify.com/episode/{latest_filtered[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
 
 	st.title('Latest Episode: ')
-	st.image(pic2, caption='JRE Filter', use_column_width=False)
+	st.image(pic2, use_column_width=False)
 	st.page_link(latest_html, label=latest_name)
+	st.write(descriptions[0])
 
 	st.title('Filtered Episode: ')
-	st.image(pic3, caption='JRE Filter', use_column_width=False)
+	st.image(pic3, use_column_width=False)
+	st.write(descriptions[0])
 
 	st.page_link(latest_filtered, label=latest_name)
 
@@ -90,3 +101,4 @@ with col2:
 		html = f"https://open.spotify.com/episode/{link[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
 		st.page_link(html, label=episode_names[i])
 		ep_links.append(html)
+		st.write(descriptions[i])
