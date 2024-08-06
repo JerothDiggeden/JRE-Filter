@@ -23,7 +23,7 @@ response = response.json()
 
 keyword = ['Patrick', 'Doblin', 'Stamets', 'Hancock', 'Carlson', 'Trussell',
 		   'Degrass', 'Kaku', 'Ryan', 'Weinstein', 'Peterson', 'Musk',
-		   'Shapiro', 'Harris', 'Rubin', 'UFO', 'UAP', 'Nutrition', 'Hunting', 'Psychedelic', 'PhD',
+		   'Shapiro', 'Harris', 'Rubin', 'UFO', 'UAP', 'Nutrition', 'Hunting', 'Psychedelic', 'PhD', 'Ph.D', 'Ph.D.',
 		   'Masters', 'Author', 'Anthropology', 'Archeology', 'Biology', 'Musician']
 
 # EPISODE CODE LIST
