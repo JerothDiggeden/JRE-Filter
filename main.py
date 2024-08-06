@@ -25,6 +25,7 @@ keyword = ['Patrick', 'Doblin', 'Stamets', 'Hancock', 'Carlson', 'Trussell',
 		   'Shapiro', 'Harris', 'Rubin', 'UFO', 'UAP', 'Nutrition', 'Hunting', 'Psychedelic', 'PHD',
 		   'Masters', 'Author', 'Anthropology', 'Archeology', 'Biology', 'Musician']
 
+# EPISODE CODE LIST
 episodes_lst = []
 episodes_dsc = []
 response = response['data']['podcastUnionV2']['episodesV2']['items']
@@ -43,6 +44,7 @@ for episode in response:
 				episodes_lst.append(ep_code)
 				break
 
+# EPISODE NAMES LIST
 episodes_dict = {}
 episode_names = []
 
@@ -57,15 +59,22 @@ for uri in response:
 			uri = uri
 		count += 1
 
+# DESCRIPTIONS LIST
 descriptions = []
+latest_desc = ''
 
 for k in response:
 	if 'entity' in k:
 		if k['entity']['_uri'] in episodes_lst:
 			descriptions.append(k['entity']['data']['description'])
 
+for l in response:
+	if 'entity' in k:
+		if k['entity']['_uri'] == episodes_lst[0]:
+			latest_desc = k['entity']['data']['description']
+
+# PAGE LAYOUT
 ep_links = []
-ic(descriptions)
 
 with (col1):
 	pic = response[0]['entity']['data']['podcastV2']['data']['coverArt']['sources'][1]['url']
@@ -87,7 +96,7 @@ with col2:
 	st.title('Latest Episode: ')
 	st.image(pic2, use_column_width=False)
 	st.page_link(latest_html, label=latest_name)
-	st.write(descriptions[0])
+	st.write(latest_desc)
 
 	st.title('Filtered Episode: ')
 	st.image(pic3, use_column_width=False)
