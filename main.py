@@ -3,7 +3,8 @@ from icecream import ic
 import streamlit as st
 
 
-st.set_page_config(page_title=None, page_icon=None, layout="wide", initial_sidebar_state="auto", menu_items=None)
+st.set_page_config(page_title="Episodes", page_icon=":material/edit:", layout="wide",
+				   initial_sidebar_state="expanded")
 
 col1, col2 = st.columns([1, 2])
 
@@ -73,18 +74,30 @@ for l in response:
 		if k['entity']['_uri'] == episodes_lst[0]:
 			latest_desc = k['entity']['data']['description']
 
+
+def clear():
+	global keys
+	keyword.clear()
+
 # PAGE LAYOUT
 ep_links = []
 
-with (col1):
+# Using object notation
+# st.sidebar.selectbox(label="Sidebar", options='', index=0)
+
+# Using "with" notation
+with st.sidebar:
 	pic = response[0]['entity']['data']['podcastV2']['data']['coverArt']['sources'][1]['url']
 	pic2 = response[0]['entity']['data']['coverArt']['sources'][1]['url']
 	pic3 = response[0]['entity']['data']['coverArt']['sources'][1]['url']
 	st.title('My JRE Filter')
 	st.image(pic, use_column_width=False)
+	st.title('Filter: ')
+	st.button('Clear List', on_click=clear)
+	keys = st.write(keyword)
 
 
-with col2:
+with col1:
 	latest_name = response[0]['entity']['data']['name']
 	latest_desc = response[0]['entity']['data']['description']
 	latest_html = response[0]['entity']['data']['sharingInfo']['shareUrl']
