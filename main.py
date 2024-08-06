@@ -21,15 +21,14 @@ response = requests.get(url, headers=headers, params=querystring)
 
 response = response.json()
 
-keyword = ['Patrick', 'Doblin', 'Stamets', 'Hancock', 'Carlson', 'Trussell',
-		   'Degrass', 'Kaku', 'Ryan', 'Weinstein', 'Peterson', 'Musk',
-		   'Shapiro', 'Harris', 'Rubin', 'UFO', 'UAP', 'Nutrition', 'Hunting', 'Psychedelic', 'PhD', 'Ph.D', 'Ph.D.',
-		   'Masters', 'Dr', 'Author', 'Anthropology', 'Archeology', 'Biology', 'Musician']
-
 # EPISODE CODE LIST
 episodes_lst = []
 episodes_dsc = []
 response = response['data']['podcastUnionV2']['episodesV2']['items']
+
+with open('data/filter.txt', 'r') as file:
+	keyword = file.readlines()
+	keyword = [keywords.strip() for keywords in keyword]
 
 for episode in response:
 
@@ -53,7 +52,6 @@ for uri in response:
 	if 'entity' in uri:
 		count = 0
 		if uri['entity']['_uri'] in episodes_lst:
-			ic(uri)
 			entity_data = uri['entity']['data']['description']
 			episodes_dict[uri['entity']['data']['name']] = entity_data
 			episode_names.append(uri['entity']['data']['name'])
@@ -75,12 +73,18 @@ for l in response:
 			latest_desc = k['entity']['data']['description']
 
 
-def clear():
-	keyword.clear()
-
-
 def update_content(value):
 	container.write(value)
+
+
+def add():
+	global add_txt
+	new_word = st.session_state.add_txt
+	keyword.append(new_word)
+	with open('data/filter.txt', 'w') as file:
+		for word in keyword:
+			file.writelines(word + "\n")
+
 
 
 # PAGE LAYOUT
@@ -98,6 +102,7 @@ with st.sidebar:
 	st.title('My JRE Filter')
 	st.image(pic, use_column_width=False)
 	st.title('Filter: ')
+	add_txt = st.text_input(key='add_txt', label='Add Filter', placeholder='Enter a New Filter Word', on_change=add)
 	st.write(keyword)
 
 with col1:
