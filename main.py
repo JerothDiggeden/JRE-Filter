@@ -1,6 +1,7 @@
 import requests
 from icecream import ic
 import streamlit as st
+import hashlib
 
 
 st.set_page_config(page_title="Episodes", page_icon=":material/edit:", layout="wide",
@@ -106,11 +107,21 @@ def clear():
 			file.writelines(word)
 
 
+def hash_password(password):
+	return hashlib.sha256(password.encode()).hexdigest()
+
+# Load user data (use a database in production)
+users_db = {}
+
+def add_user(username, password):
+	users_db[username] = hash_password(password)
+
+def check_user(username, password):
+	return users_db.get(username) == hash_password(password)
+
+
 # PAGE LAYOUT
 ep_links = []
-
-# Using object notation
-# st.sidebar.selectbox(label="Sidebar", options='', index=0)
 
 # Using "with" notation
 with st.sidebar:
@@ -127,6 +138,42 @@ with st.sidebar:
 	st.write(keyword)
 
 with col1:
+	@st.dialog(title='Login', width='small')
+	def login():
+
+		# Signup form
+		st.title("Signup Form")
+		new_username = st.text_input("Username")
+		new_password = st.text_input("Password", type="password")
+
+		if st.button("Signup"):
+			if new_username in users_db:
+				st.warning("Username already exists.")
+			else:
+				add_user(new_username, new_password)
+				st.success("Account created successfully!")
+
+		# Login form
+		st.title("Login Form")
+		username = st.text_input("Enter your username")
+		password = st.text_input("Enter your password", type="password")
+
+		if st.button("Login"):
+			if check_user(username, password):
+				st.success(f"Welcome, {username}!")
+			else:
+				st.error("Invalid username or password.")
+
+	if "vote" not in st.session_state:
+		st.write("Vote for your favorite")
+		if st.button("A"):
+			vote("A")
+		if st.button("B"):
+			vote("B")
+	else:
+		f"You voted for {st.session_state.vote['item']} because {st.session_state.vote['reason']}"
+
+
 	latest_name = response[0]['entity']['data']['name']
 	latest_desc = response[0]['entity']['data']['description']
 	latest_html = response[0]['entity']['data']['sharingInfo']['shareUrl']
