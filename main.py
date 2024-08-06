@@ -23,7 +23,7 @@ response = response.json()
 
 keyword = ['Patrick', 'Doblin', 'Stamets', 'Hancock', 'Carlson', 'Trussell',
 		   'Degrass', 'Kaku', 'Ryan', 'Weinstein', 'Peterson', 'Musk',
-		   'Shapiro', 'Harris', 'Rubin', 'UFO', 'UAP', 'Nutrition', 'Hunting', 'Psychedelic', 'PHD',
+		   'Shapiro', 'Harris', 'Rubin', 'UFO', 'UAP', 'Nutrition', 'Hunting', 'Psychedelic', 'PhD',
 		   'Masters', 'Author', 'Anthropology', 'Archeology', 'Biology', 'Musician']
 
 # EPISODE CODE LIST
@@ -76,8 +76,12 @@ for l in response:
 
 
 def clear():
-	global keys
 	keyword.clear()
+
+
+def update_content(value):
+	container.write(value)
+
 
 # PAGE LAYOUT
 ep_links = []
@@ -87,15 +91,14 @@ ep_links = []
 
 # Using "with" notation
 with st.sidebar:
+	container = st.empty()
 	pic = response[0]['entity']['data']['podcastV2']['data']['coverArt']['sources'][1]['url']
 	pic2 = response[0]['entity']['data']['coverArt']['sources'][1]['url']
 	pic3 = response[0]['entity']['data']['coverArt']['sources'][1]['url']
 	st.title('My JRE Filter')
 	st.image(pic, use_column_width=False)
 	st.title('Filter: ')
-	st.button('Clear List', on_click=clear)
-	keys = st.write(keyword)
-
+	st.write(keyword)
 
 with col1:
 	latest_name = response[0]['entity']['data']['name']
