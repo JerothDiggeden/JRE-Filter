@@ -1,7 +1,10 @@
 import requests
 from icecream import ic
 import streamlit as st
-import hashlib
+import pickle
+from pathlib import Path
+import bcrypt
+import streamlit_authenticator as auth
 
 
 st.set_page_config(page_title="Episodes", page_icon=":material/edit:", layout="wide",
@@ -22,9 +25,13 @@ response = requests.get(url, headers=headers, params=querystring)
 
 response = response.json()
 
-# EPISODE CODE LIST
+users_db = {}
 episodes_lst = []
 episodes_dsc = []
+episodes_dict = {}
+episode_names = []
+descriptions = []
+latest_desc = ''
 response = response['data']['podcastUnionV2']['episodesV2']['items']
 
 with open('data/filter.txt', 'r') as file:
@@ -46,9 +53,6 @@ for episode in response:
 				break
 
 # EPISODE NAMES LIST
-episodes_dict = {}
-episode_names = []
-
 for uri in response:
 	if 'entity' in uri:
 		count = 0
@@ -60,9 +64,6 @@ for uri in response:
 		count += 1
 
 # DESCRIPTIONS LIST
-descriptions = []
-latest_desc = ''
-
 for k in response:
 	if 'entity' in k:
 		if k['entity']['_uri'] in episodes_lst:
@@ -106,21 +107,6 @@ def clear():
 		for word in keyword:
 			file.writelines(word)
 
-
-def hash_password(password):
-	return hashlib.sha256(password.encode()).hexdigest()
-
-# Load user data (use a database in production)
-users_db = {}
-
-def add_user(username, password):
-	users_db[username] = hash_password(password)
-
-def check_user(username, password):
-	return users_db.get(username) == hash_password(password)
-
-
-# PAGE LAYOUT
 ep_links = []
 
 # Using "with" notation
@@ -138,42 +124,6 @@ with st.sidebar:
 	st.write(keyword)
 
 with col1:
-	@st.dialog(title='Login', width='small')
-	def login():
-
-		# Signup form
-		st.title("Signup Form")
-		new_username = st.text_input("Username")
-		new_password = st.text_input("Password", type="password")
-
-		if st.button("Signup"):
-			if new_username in users_db:
-				st.warning("Username already exists.")
-			else:
-				add_user(new_username, new_password)
-				st.success("Account created successfully!")
-
-		# Login form
-		st.title("Login Form")
-		username = st.text_input("Enter your username")
-		password = st.text_input("Enter your password", type="password")
-
-		if st.button("Login"):
-			if check_user(username, password):
-				st.success(f"Welcome, {username}!")
-			else:
-				st.error("Invalid username or password.")
-
-	if "vote" not in st.session_state:
-		st.write("Vote for your favorite")
-		if st.button("A"):
-			vote("A")
-		if st.button("B"):
-			vote("B")
-	else:
-		f"You voted for {st.session_state.vote['item']} because {st.session_state.vote['reason']}"
-
-
 	latest_name = response[0]['entity']['data']['name']
 	latest_desc = response[0]['entity']['data']['description']
 	latest_html = response[0]['entity']['data']['sharingInfo']['shareUrl']
@@ -208,3 +158,39 @@ with col1:
 		st.page_link(html, label=episode_names[i])
 		ep_links.append(html)
 		st.write(descriptions[i])
+
+
+# dialog_placeholder = st.empty()
+# 	# A button to trigger the "popup" dialog
+# 	if st.button("Sign-Up"):
+# 		# Use the placeholder to display the dialog content
+# 		with dialog_placeholder.container():
+# 			st.write("Sign-Up")
+# 			try:
+# 				for i in range(1):
+# 					st.write("Username: ")
+# 					uname_s = st.text_input(label="Username", key="username", on_change=None, type='default')
+# 					st.write("Password: ")
+# 					psswd_s = st.text_input(label="Password", key="password", on_change=None, type="password")
+# 			except Exception as e:
+# 				ic('Exception')
+#
+# 			if st.button("Sign-Up"):
+# 				add_user(uname_s, psswd_s)
+# 			if st.button("Close"):
+# 				# Clear the dialog content
+# 				dialog_placeholder.empty()
+#
+# 	if st.button("Login"):
+# 		# Use the placeholder to display the dialog content
+# 		with dialog_placeholder.container():
+# 			st.write("Login")
+# 			st.write("Username: ")
+# 			uname_l = st.text_input(key='uname', label="Username")
+# 			st.write("Password: ")
+# 			uname_l = st.text_input(key='pwd', label="Password")
+# 			if st.button("Login"):
+# 				check_user(uname_l, uname_s)
+# 			if st.button("Close"):
+# 				# Clear the dialog content
+# 				dialog_placeholder.empty()
