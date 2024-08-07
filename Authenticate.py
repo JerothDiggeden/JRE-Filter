@@ -1,4 +1,3 @@
-from icecream import ic
 import streamlit as st
 import bcrypt
 import os
@@ -8,6 +7,8 @@ from pathlib import Path
 
 st.set_page_config(page_title="Episodes", page_icon=":material/edit:", layout="wide",
                    initial_sidebar_state="collapsed")
+
+col1, col2, col3 = st.columns([2, 1, 2])
 
 
 # For demonstration, using an in-memory dictionary
@@ -89,7 +90,7 @@ def login(username, password):
 
 def app():
     # Main application logic
-    st.title("User Authentication")
+    st.title("Authentication")
 
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
@@ -110,5 +111,5 @@ def app():
             if st.button("Login"):
                 login(username, password)
 
-
-app()
+with col2:
+    app()

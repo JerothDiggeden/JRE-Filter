@@ -1,10 +1,6 @@
 import requests
-import sys
-import os
 import streamlit as st
 
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 if 'username' not in st.session_state:
     st.session_state.username = None
