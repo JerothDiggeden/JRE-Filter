@@ -30,10 +30,13 @@ episode_names = []
 descriptions = []
 latest_desc = ''
 response = response['data']['podcastUnionV2']['episodesV2']['items']
+try:
+    with open(f'user_files/{username}/filter.txt', 'r') as file:
+        keyword = file.readlines()
+        keyword = [keywords.strip() for keywords in keyword]
+except FileNotFoundError:
+    st.dialog('Please Login')
 
-with open(f'user_files/{username}/filter.txt', 'r') as file:
-    keyword = file.readlines()
-    keyword = [keywords.strip() for keywords in keyword]
 
 for episode in response:
 
@@ -83,26 +86,34 @@ def add():
     global add_txt
     new_word = st.session_state.add_txt
     keyword.append(new_word)
-    with open(f'user_files/{username}/filter.txt', 'w') as file:
-        for word in keyword:
-            file.writelines(word + "\n")
+    try:
+        with open(f'user_files/{username}/filter.txt', 'w') as file:
+            for word in keyword:
+                file.writelines(word + "\n")
+    except FileNotFoundError:
+        st.dialog('Please Login')
 
 
 def sub():
     global add_txt
     sub_word = st.session_state.sub_txt
     keyword.remove(sub_word)
-    with open(f'user_files/{username}/filter.txt', 'w') as file:
-        for word in keyword:
-            file.writelines(word + "\n")
-
+    try:
+        with open(f'user_files/{username}/filter.txt', 'w') as file:
+            for word in keyword:
+                file.writelines(word + "\n")
+    except FileNotFoundError:
+        st.dialog('Please Login')
 
 def clear():
     keyword.clear()
     keyword.append("")
-    with open(f'user_files/{username}/filter.txt', 'w') as file:
-        for word in keyword:
-            file.writelines(word)
+    try:
+        with open(f'user_files/{username}/filter.txt', 'w') as file:
+            for word in keyword:
+                file.writelines(word)
+    except FileNotFoundError:
+        st.dialog('Please Login')
 
 
 ep_links = []
@@ -133,6 +144,8 @@ with col1:
     except IndexError:
         print("Index Error")
 
+    st.title('')
+    st.title('')
     st.title('Latest Episode: ')
     st.image(pic2, use_column_width=False)
     st.page_link(latest_html, label=latest_name)
