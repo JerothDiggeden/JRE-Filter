@@ -3,6 +3,7 @@ import streamlit as st
 import bcrypt
 import os
 import pickle
+from pathlib import Path
 
 
 st.set_page_config(page_title="Episodes", page_icon=":material/edit:", layout="wide",
@@ -53,6 +54,12 @@ def signup(username, password):
         # Write updated data back to the pickle file
         with open('data/hashed_psswds.pkl', 'wb') as f:
             pickle.dump(user_data, f)
+
+        # Specify the nested directory path
+        nested_directory = Path(f"user_files/{username}")
+
+        # Create the nested directories
+        nested_directory.mkdir(parents=True, exist_ok=True)
 
         with open(f'user_files/{username}/filter.txt', 'w') as f:
             f.write('')
