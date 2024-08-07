@@ -55,10 +55,13 @@ def signup(username, password):
         with open('data/hashed_psswds.pkl', 'wb') as f:
             pickle.dump(user_data, f)
 
-        # Specify the nested directory path
-        nested_directory = Path(f"user_files/{username}")
+        # Get the home directory of the current user
+        home_directory = Path.home()
 
-        # Create the nested directories
+        # Define the user-specific directory path
+        nested_directory = home_directory / 'user_files' / username
+
+        # Create the directories
         nested_directory.mkdir(parents=True, exist_ok=True)
 
         with open(f'user_files/{username}/filter.txt', 'w') as f:
