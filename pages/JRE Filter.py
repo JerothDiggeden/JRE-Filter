@@ -1,14 +1,14 @@
 import requests
-from icecream import ic
+import sys
+import os
 import streamlit as st
-import pickle
-from pathlib import Path
-import bcrypt
-import streamlit_authenticator as auth
 
 
-st.set_page_config(page_title="Episodes", page_icon=":material/edit:", layout="wide",
-                   initial_sidebar_state="collapsed")
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+if 'username' not in st.session_state:
+    st.session_state.username = None
+username = st.session_state.username
 
 users_db = {}
 col1, col2 = st.columns([1, 2])
@@ -35,7 +35,7 @@ descriptions = []
 latest_desc = ''
 response = response['data']['podcastUnionV2']['episodesV2']['items']
 
-with open('data/filter.txt', 'r') as file:
+with open(f'user_files/{username}/filter.txt', 'r') as file:
     keyword = file.readlines()
     keyword = [keywords.strip() for keywords in keyword]
 
@@ -87,7 +87,7 @@ def add():
     global add_txt
     new_word = st.session_state.add_txt
     keyword.append(new_word)
-    with open('data/filter.txt', 'w') as file:
+    with open(f'user_files/{username}/filter.txt', 'w') as file:
         for word in keyword:
             file.writelines(word + "\n")
 
@@ -96,7 +96,7 @@ def sub():
     global add_txt
     sub_word = st.session_state.sub_txt
     keyword.remove(sub_word)
-    with open('data/filter.txt', 'w') as file:
+    with open(f'user_files/{username}/filter.txt', 'w') as file:
         for word in keyword:
             file.writelines(word + "\n")
 
@@ -104,7 +104,7 @@ def sub():
 def clear():
     keyword.clear()
     keyword.append("")
-    with open('data/filter.txt', 'w') as file:
+    with open(f'user_files/{username}/filter.txt', 'w') as file:
         for word in keyword:
             file.writelines(word)
 
