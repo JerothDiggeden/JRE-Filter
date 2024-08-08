@@ -123,9 +123,7 @@ def add():
             cipher = Fernet(key)
             with open(f"user_files/{username}/filter.txt", "rb") as f:
                 encrypted_data = f.read()
-                # encrypted_data = str(encrypted_data).encode()
                 decrypted_data = cipher.decrypt(encrypted_data)
-                # decrypted_data = decrypted_data.decode("utf-8")
                 f.close()
                 with open(f'user_files/{username}/filter.txt', 'wb') as file:
                     key = keys[username]
@@ -166,6 +164,7 @@ def clear():
         st.dialog('Please Login')
 
 ep_links = []
+dec_filters = []
 
 with open("data/keys.pkl", "rb") as f:
     keys = pickle.load(f)
@@ -174,17 +173,15 @@ with open("data/keys.pkl", "rb") as f:
     with open(f"user_files/{username}/filter.txt", "rb") as f:
         encrypted_data = f.read()
         decrypted_data = cipher.decrypt(encrypted_data)
-
-# with open("data/keys.pkl", "rb") as f:
-#     keys = pickle.load(f)
-# key = keys[username]
-# cipher = Fernet(key)
-# with open(f"user_files/{username}/filter.txt", "rb") as file:
-#     file_data = file.read()
-# encrypted_data = cipher.encrypt(file_data)
-#
-# with open(f"user_files/{username}/filter.txt", 'wb') as file:
-#     file.write(encrypted_data)
+        ic(decrypted_data)
+        decrypted_data = decrypted_data.decode('utf-8')
+        decrypted_data = str(decrypted_data)
+        decrypted_data = decrypted_data.replace('b', '')
+        decrypted_data = decrypted_data.replace("'", '')
+        decrypted_data = decrypted_data.strip("[]")
+        decrypted_data = decrypted_data.split(',')
+        for filter in decrypted_data:
+            dec_filters.append(filter)
 
 # Using "with" notation
 with st.sidebar:
