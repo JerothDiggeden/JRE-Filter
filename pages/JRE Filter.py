@@ -1,5 +1,7 @@
 import requests
 import streamlit as st
+import pickle
+from cryptography.fernet import Fernet
 
 
 if 'username' not in st.session_state:
@@ -28,8 +30,11 @@ episodes_dsc = []
 episodes_dict = {}
 episode_names = []
 descriptions = []
+key_names = []
+
 latest_desc = ''
 response = response['data']['podcastUnionV2']['episodesV2']['items']
+
 try:
     with open(f'user_files/{username}/filter.txt', 'r') as file:
         keyword = file.readlines()
@@ -80,6 +85,18 @@ for l in response:
 
 def update_content(value):
     container.write(value)
+
+def new_key():
+    with open("keys/keys.pkl", "rb") as f:
+        keys = pickle.load(f)
+    i = username
+    if i not in keys:
+        key = Fernet.generate_key()
+        keys[i] = key
+        key_names.append(i)
+    # Save the key to a file (optional)
+    with open("keys/keys.pkl", "wb") as f:
+        pickle.dump(keys, f)
 
 
 def add():

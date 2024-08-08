@@ -3,6 +3,8 @@ import bcrypt
 import os
 import pickle
 from pathlib import Path
+from cryptography.fernet import Fernet
+from icecream import ic
 
 
 st.set_page_config(page_title="Episodes", page_icon=":material/edit:", layout="wide",
@@ -16,6 +18,29 @@ col1, col2, col3 = st.columns([2, 1, 2])
 BASE_DIR = "user_files"
 
 global username
+
+key_names = []
+keys1 = {}
+keys2 = {}
+
+# # GENERATE KEYS FOR EMPTY FILES
+#
+# i = 'admin'
+# key = Fernet.generate_key()
+# keys1[i] = key
+# key_names.append(i)
+# # Save the key to a file (optional)
+# with open("data/keys.pkl", "wb") as f:
+#     pickle.dump(keys1, f)
+#
+# i = 'admin'
+# key = Fernet.generate_key()
+# keys2[i] = key
+# key_names.append(i)
+# # Save the key to a file (optional)
+# with open("data/hashed_psswds.pkl", "wb") as f:
+#     pickle.dump(keys2, f)
+
 
 def hash_password(password):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -38,6 +63,33 @@ def signup(username, password):
         try:
             with open('data/hashed_psswds.pkl', 'rb') as f:
                 user_data = pickle.load(f)
+                i = username
+                if i not in user_data:
+                    key = Fernet.generate_key()
+                    keys1[i] = key
+                    key_names.append(i)
+                # Save the key to a file (optional)
+                with open("data/hashed_psswds.pkl", "wb") as f:
+                    pickle.dump(keys1, f)
+
+        except (pickle.UnpicklingError, EOFError, AttributeError, ValueError) as e:
+            st.error(f"Error loading user data: {e}")
+            user_data = {}
+
+    if os.path.exists('data/keys.pkl'):
+        try:
+            with open('data/keys.pkl', 'rb') as f:
+                filter_keys = pickle.load(f)
+                i = username
+                keys2 = filter_keys
+                if i not in filter_keys:
+                    key = Fernet.generate_key()
+                    keys2[i] = key
+                    key_names.append(i)
+                # Save the key to a file (optional)
+                with open("data/keys.pkl", "wb") as f:
+                    pickle.dump(keys2, f)
+
         except (pickle.UnpicklingError, EOFError, AttributeError, ValueError) as e:
             st.error(f"Error loading user data: {e}")
             user_data = {}
@@ -46,11 +98,24 @@ def signup(username, password):
 
     if username in user_data:
         st.warning("Username already exists.")
+
     else:
         hashed_pw = hash_password(password)  # Assuming this function is defined
         user_data[username] = hashed_pw
         create_user_folder(username)  # Assuming this function is defined
         st.success("Signup successful. You can now log in.")
+
+        with open("data/keys.pkl", "rb") as f:
+            keys = pickle.load(f)
+        b = username
+        b = b.encode('utf-8')
+        if b not in keys:
+            key = Fernet.generate_key()
+            keys[username] = key
+            key_names.append(username)
+        # Save the key to a file (optional)
+        with open("data/keys.pkl", "wb") as f:
+            pickle.dump(keys, f)
 
         # Write updated data back to the pickle file
         with open('data/hashed_psswds.pkl', 'wb') as f:
@@ -87,9 +152,8 @@ def login(username, password):
         st.warning("Incorrect password.")
 
 
+with col2:
 
-def app():
-    # Main application logic
     st.title("Authentication")
 
     if 'logged_in' not in st.session_state:
@@ -110,6 +174,3 @@ def app():
         elif option == "Login":
             if st.button("Login"):
                 login(username, password)
-
-with col2:
-    app()
