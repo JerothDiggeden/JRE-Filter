@@ -129,7 +129,11 @@ def add():
                     key = keys[username]
                     cipher = Fernet(key)
                     new_word = new_word.encode('utf-8')
-                    file.write(decrypted_data + new_word)
+                    ic(new_word)
+                    ic(decrypted_data)
+                    comma = ", "
+                    comma = comma.encode('utf-8')
+                    file.write(decrypted_data + comma + new_word)
                     file.close()
                     with open(f"user_files/{username}/filter.txt", "rb") as f:
                         new_data = f.read()
@@ -177,8 +181,6 @@ with open("data/keys.pkl", "rb") as f:
         decrypted_data = decrypted_data.decode('utf-8')
         decrypted_data = str(decrypted_data)
         decrypted_data = decrypted_data.replace('b', '')
-        decrypted_data = decrypted_data.replace("'", '')
-        decrypted_data = decrypted_data.strip("[]")
         decrypted_data = decrypted_data.split(',')
         for filter in decrypted_data:
             dec_filters.append(filter)
