@@ -131,7 +131,18 @@ def signup(username, password):
         nested_directory.mkdir(parents=True, exist_ok=True)
 
         with open(f'user_files/{username}/filter.txt', 'w') as f:
-            f.write('')
+            f.write('REMOVE ME')
+
+        with open("data/keys.pkl", "rb") as f:
+            keys = pickle.load(f)
+        key = keys[username]
+        cipher = Fernet(key)
+        with open(f"user_files/{username}/filter.txt", "rb") as file:
+            file_data = file.read()
+        encrypted_data = cipher.encrypt(file_data)
+        file.close()
+        with open(f"user_files/{username}/filter.txt", 'wb') as file:
+            file.write(encrypted_data)
 
 
 def login(username, password):

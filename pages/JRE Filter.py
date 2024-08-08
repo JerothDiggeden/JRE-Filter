@@ -2,11 +2,15 @@ import requests
 import streamlit as st
 import pickle
 from cryptography.fernet import Fernet
+from icecream import ic
 
 
 if 'username' not in st.session_state:
     st.session_state.username = None
+
 username = st.session_state.username
+
+ic(username)
 
 users_db = {}
 col1, col2 = st.columns([1, 2])
@@ -31,6 +35,9 @@ episodes_dict = {}
 episode_names = []
 descriptions = []
 key_names = []
+keyword_lst = []
+dec_lst = []
+
 
 latest_desc = ''
 response = response['data']['podcastUnionV2']['episodesV2']['items']
@@ -38,7 +45,13 @@ response = response['data']['podcastUnionV2']['episodesV2']['items']
 try:
     with open(f'user_files/{username}/filter.txt', 'r') as file:
         keyword = file.readlines()
-        keyword = [keywords.strip() for keywords in keyword]
+        with open("keys/key.pkl", "rb") as f:
+            keys = pickle.load(f)
+            key = keys[username]
+            cipher = Fernet(key)
+            encrypted_data = keyword
+            decrypted_data = list(cipher.decrypt(encrypted_data))
+            keyword = [keywords.strip() for keywords in keyword]
 except FileNotFoundError:
     st.dialog('Please Login')
 
@@ -100,13 +113,33 @@ def new_key():
 
 
 def add():
-    global add_txt
+    global add_txt, decrypted_data
     new_word = st.session_state.add_txt
-    keyword.append(new_word)
+    keyword_lst.append(new_word)
     try:
-        with open(f'user_files/{username}/filter.txt', 'w') as file:
-            for word in keyword:
-                file.writelines(word + "\n")
+        with open("data/keys.pkl", "rb") as f:
+            keys = pickle.load(f)
+            key = keys[username]
+            cipher = Fernet(key)
+            with open(f"user_files/{username}/filter.txt", "rb") as f:
+                encrypted_data = f.read()
+                # encrypted_data = str(encrypted_data).encode()
+                decrypted_data = cipher.decrypt(encrypted_data)
+                # decrypted_data = decrypted_data.decode("utf-8")
+                f.close()
+                with open(f'user_files/{username}/filter.txt', 'wb') as file:
+                    key = keys[username]
+                    cipher = Fernet(key)
+                    new_word = new_word.encode('utf-8')
+                    file.write(decrypted_data + new_word)
+                    file.close()
+                    with open(f"user_files/{username}/filter.txt", "rb") as f:
+                        new_data = f.read()
+                        encrypted_data = cipher.encrypt(new_data)
+                        with open(f'user_files/{username}/filter.txt', 'wb') as file:
+                            file.write(encrypted_data)
+                            file.close()
+
     except FileNotFoundError:
         st.dialog('Please Login')
 
@@ -132,8 +165,26 @@ def clear():
     except FileNotFoundError:
         st.dialog('Please Login')
 
-
 ep_links = []
+
+with open("data/keys.pkl", "rb") as f:
+    keys = pickle.load(f)
+    key = keys[username]
+    cipher = Fernet(key)
+    with open(f"user_files/{username}/filter.txt", "rb") as f:
+        encrypted_data = f.read()
+        decrypted_data = cipher.decrypt(encrypted_data)
+
+# with open("data/keys.pkl", "rb") as f:
+#     keys = pickle.load(f)
+# key = keys[username]
+# cipher = Fernet(key)
+# with open(f"user_files/{username}/filter.txt", "rb") as file:
+#     file_data = file.read()
+# encrypted_data = cipher.encrypt(file_data)
+#
+# with open(f"user_files/{username}/filter.txt", 'wb') as file:
+#     file.write(encrypted_data)
 
 # Using "with" notation
 with st.sidebar:
@@ -148,7 +199,7 @@ with st.sidebar:
     sub_txt = st.text_input(key='sub_txt', label='Remove Filter', placeholder='Enter a Filter Word to Remove',
                             on_change=sub)
     clear = st.button('Clear', key='clear', on_click=clear)
-    st.write(keyword)
+    filter_lst = st.write(decrypted_data)
 
 with col1:
     latest_name = response[0]['entity']['data']['name']
