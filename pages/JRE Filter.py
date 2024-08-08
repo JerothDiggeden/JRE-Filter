@@ -131,7 +131,7 @@ def add():
                     new_word = new_word.encode('utf-8')
                     ic(new_word)
                     ic(decrypted_data)
-                    comma = ", "
+                    comma = ","
                     comma = comma.encode('utf-8')
                     file.write(decrypted_data + comma + new_word)
                     file.close()
@@ -149,11 +149,37 @@ def add():
 def sub():
     global add_txt
     sub_word = st.session_state.sub_txt
-    keyword.remove(sub_word)
     try:
-        with open(f'user_files/{username}/filter.txt', 'w') as file:
-            for word in keyword:
-                file.writelines(word + "\n")
+        with open("data/keys.pkl", "rb") as f:
+            keys = pickle.load(f)
+            key = keys[username]
+            cipher = Fernet(key)
+            with open(f"user_files/{username}/filter.txt", "rb") as f:
+                encrypted_data = f.read()
+                decrypted_data = cipher.decrypt(encrypted_data)
+                decrypted_data = decrypted_data.decode('utf-8')
+                decrypted_data = str(decrypted_data)
+                decrypted_data = decrypted_data.replace('b', '')
+                ic(decrypted_data)
+                decrypted_data = decrypted_data.split(',')
+                ic(decrypted_data)
+                decrypted_data = decrypted_data.remove(sub_word)
+                f.close()
+                with open(f'user_files/{username}/filter.txt', 'wb') as file:
+                    key = keys[username]
+                    cipher = Fernet(key)
+                    ic(sub_word)
+                    ic(decrypted_data)
+                    if decrypted_data:
+                        file.write(decrypted_data)
+                    else:
+                        file.close()
+                    with open(f"user_files/{username}/filter.txt", "rb") as f:
+                        new_data = f.read()
+                        encrypted_data = cipher.encrypt(new_data)
+                        with open(f'user_files/{username}/filter.txt', 'wb') as file:
+                            file.write(encrypted_data)
+                            file.close()
     except FileNotFoundError:
         st.dialog('Please Login')
 

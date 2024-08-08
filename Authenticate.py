@@ -131,7 +131,7 @@ def signup(username, password):
         nested_directory.mkdir(parents=True, exist_ok=True)
 
         with open(f'user_files/{username}/filter.txt', 'w') as f:
-            remove = "REMOVE ME, REMOVE ME TOO"
+            remove = "REMOVE ME,REMOVE ME TOO"
             f.writelines(remove)
 
         with open("data/keys.pkl", "rb") as f:
