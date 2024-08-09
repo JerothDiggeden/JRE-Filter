@@ -36,6 +36,7 @@ episode_names = []
 descriptions = []
 key_names = []
 keyword_lst = []
+keyword = []
 dec_lst = []
 
 
@@ -43,32 +44,33 @@ latest_desc = ''
 response = response['data']['podcastUnionV2']['episodesV2']['items']
 
 try:
-    with open(f'user_files/{username}/filter.txt', 'r') as file:
-        keyword = file.readlines()
-        with open("keys/key.pkl", "rb") as f:
-            keys = pickle.load(f)
-            key = keys[username]
-            cipher = Fernet(key)
-            encrypted_data = keyword
-            decrypted_data = list(cipher.decrypt(encrypted_data))
-            keyword = [keywords.strip() for keywords in keyword]
+    with open("data/keys.pkl", "rb") as f:
+        keys = pickle.load(f)
+        key = keys[username]
+        cipher = Fernet(key)
+        ic(cipher)
+        with open(f"user_files/{username}/filter.txt", "rb") as f:
+            encrypted_data = f.read()
+            decrypted_data = cipher.decrypt(encrypted_data)
+            decrypted_data = decrypted_data.decode('utf-8')
+            decrypted_data = str(decrypted_data)
+            decrypted_data = decrypted_data.replace('b', '')
+            decrypted_data = decrypted_data.split(',')
+            keyword = decrypted_data
+        ic(decrypted_data)
 except FileNotFoundError:
     st.dialog('Please Login')
 
 
 for episode in response:
-
     if 'entity' in episode:
         entity_data = episode['entity']['data']
-
         ep_code = entity_data.get('uri', '')
-
         description = entity_data.get('description', '').split()
-
         for word in description:
             if word in keyword:
                 episodes_lst.append(ep_code)
-                break
+        ic(episodes_lst)
 
 # EPISODE NAMES LIST
 for uri in response:
@@ -86,12 +88,14 @@ for k in response:
     if 'entity' in k:
         if k['entity']['_uri'] in episodes_lst:
             descriptions.append(k['entity']['data']['description'])
+            ic(descriptions)
 
 for l in response:
-    if 'entity' in k:
+    if 'entity' in l:
         try:
-            if k['entity']['_uri'] == episodes_lst[0]:
-                latest_desc = k['entity']['data']['description']
+            if l['entity']['_uri'] == episodes_lst[0]:
+                latest_desc = l['entity']['data']['description']
+
         except IndexError:
             continue
 
@@ -129,8 +133,6 @@ def add():
                     key = keys[username]
                     cipher = Fernet(key)
                     new_word = new_word.encode('utf-8')
-                    ic(new_word)
-                    ic(decrypted_data)
                     comma = ","
                     comma = comma.encode('utf-8')
                     file.write(decrypted_data + comma + new_word)
@@ -160,16 +162,12 @@ def sub():
                 decrypted_data = decrypted_data.decode('utf-8')
                 decrypted_data = str(decrypted_data)
                 decrypted_data = decrypted_data.replace('b', '')
-                ic(decrypted_data)
                 decrypted_data = decrypted_data.split(',')
-                ic(decrypted_data)
                 decrypted_data = decrypted_data.remove(sub_word)
                 f.close()
                 with open(f'user_files/{username}/filter.txt', 'wb') as file:
                     key = keys[username]
                     cipher = Fernet(key)
-                    ic(sub_word)
-                    ic(decrypted_data)
                     if decrypted_data:
                         file.write(decrypted_data)
                     else:
@@ -203,13 +201,13 @@ with open("data/keys.pkl", "rb") as f:
     with open(f"user_files/{username}/filter.txt", "rb") as f:
         encrypted_data = f.read()
         decrypted_data = cipher.decrypt(encrypted_data)
-        ic(decrypted_data)
         decrypted_data = decrypted_data.decode('utf-8')
         decrypted_data = str(decrypted_data)
         decrypted_data = decrypted_data.replace('b', '')
         decrypted_data = decrypted_data.split(',')
         for filter in decrypted_data:
             dec_filters.append(filter)
+
 
 # Using "with" notation
 with st.sidebar:
@@ -226,6 +224,7 @@ with st.sidebar:
     clear = st.button('Clear', key='clear', on_click=clear)
     filter_lst = st.write(decrypted_data)
 
+ic(episodes_lst)
 with col1:
     latest_name = response[0]['entity']['data']['name']
     latest_desc = response[0]['entity']['data']['description']
@@ -253,12 +252,13 @@ with col1:
 
     try:
         st.page_link(latest_filtered, label=latest_name)
+
     except NameError:
         print("Name Error")
 
     st.title('Old Episodes: ')
-
     for i, link in enumerate(episodes_lst):
+
         html = f"https://open.spotify.com/episode/{link[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
         st.page_link(html, label=episode_names[i])
         ep_links.append(html)
