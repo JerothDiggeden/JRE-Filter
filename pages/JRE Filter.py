@@ -215,16 +215,17 @@ try:
 
 
 except KeyError:
-    st.session_state.show_dialog = True  # Set the flag to show the dialog
-    # Step 3: Display the dialog box conditionally
-    if st.session_state.show_dialog:
-        st.write("Dialog Box")
-        st.write("Please Sign-Up & Login!")
-
-        # "OK" button to hide the dialog
-        if st.button("OK"):
-            st.session_state.show_dialog = False
-            st.experimental_rerun()  # Rerun the script to refresh the UI
+    ic('KeyError')
+#     st.session_state.show_dialog = True  # Set the flag to show the dialog
+#     # Step 3: Display the dialog box conditionally
+#     if st.session_state.show_dialog:
+#         st.write("Dialog Box")
+#         st.write("Please Sign-Up & Login!")
+#
+#         # "OK" button to hide the dialog
+#         if st.button("OK"):
+#             st.session_state.show_dialog = False
+#             st.experimental_rerun()  # Rerun the script to refresh the UI
 
 
 # Using "with" notation
@@ -245,42 +246,44 @@ with st.sidebar:
     except NameError:
         st.dialog('Please Login')
 
-ic(episodes_lst)
-with col1:
-    latest_name = response[0]['entity']['data']['name']
-    latest_desc = response[0]['entity']['data']['description']
-    latest_html = response[0]['entity']['data']['sharingInfo']['shareUrl']
-    try:
-        length = len(episodes_lst)
-        latest_filtered = episodes_lst[length - 1]
-        latest_filtered = f"https://open.spotify.com/episode/{latest_filtered[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
-    except IndexError:
-        print("Index Error")
+if st.session_state['logged_in'] == True:
+    with col1:
+        latest_name = response[0]['entity']['data']['name']
+        latest_desc = response[0]['entity']['data']['description']
+        latest_html = response[0]['entity']['data']['sharingInfo']['shareUrl']
+        try:
+            length = len(episodes_lst)
+            latest_filtered = episodes_lst[length - 1]
+            latest_filtered = f"https://open.spotify.com/episode/{latest_filtered[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
+        except IndexError:
+            print("Index Error")
 
-    st.title('')
-    st.title('Latest Episode: ')
-    st.image(pic2, use_column_width=False)
-    st.page_link(latest_html, label=latest_name)
-    st.write(latest_desc)
+        st.title('')
+        st.title('Latest Episode: ')
+        st.image(pic2, use_column_width=False)
+        st.page_link(latest_html, label=latest_name)
+        st.write(latest_desc)
 
-    st.title('Filtered Episode: ')
-    st.image(pic3, use_column_width=False)
-    try:
-        st.write(descriptions[0])
-    except IndexError:
-        print("Index Error")
+        # st.title('Filtered Episode: ')
+        # st.image(pic3, use_column_width=False)
+        # try:
+        #     st.write(descriptions[0])
+        # except IndexError:
+        #     print("Index Error")
+        #
+        # try:
+        #     st.page_link(latest_filtered, label=latest_name)
+        #
+        # except NameError:
+        #     print("Name Error")
 
-    try:
-        st.page_link(latest_filtered, label=latest_name)
+        st.title('Old Filtered Episodes: ')
+        for i, link in enumerate(episodes_lst):
 
-    except NameError:
-        print("Name Error")
+            html = f"https://open.spotify.com/episode/{link[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
+            st.page_link(html, label=episode_names[i])
+            ep_links.append(html)
+            st.write(descriptions[i])
 
-    st.title('Old Episodes: ')
-    ic(episode_names)
-    for i, link in enumerate(episodes_lst):
-
-        html = f"https://open.spotify.com/episode/{link[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
-        st.page_link(html, label=episode_names[i])
-        ep_links.append(html)
-        st.write(descriptions[i])
+else:
+    st.write("Please Sign-Up & Login!")

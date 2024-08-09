@@ -157,6 +157,8 @@ def login(username, password):
         st.session_state['user_folder'] = os.path.join(BASE_DIR, username)
         if username not in st.session_state:
             st.session_state.username = username
+        state = 'login'
+        st.session_state.state = True
     else:
         st.warning("Incorrect password.")
 
