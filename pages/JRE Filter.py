@@ -83,12 +83,6 @@ for uri in response:
             episodes_dict[uri['entity']['data']['name']] = entity_data
             # episode_names.append(uri['entity']['data']['name'])
 
-# DESCRIPTIONS LIST
-# for k in response:
-#     if 'entity' in k:
-#         if k['entity']['_uri'] in episodes_lst:
-#             descriptions.append(k['entity']['data']['description'])
-#             ic(descriptions)
 
 for l in response:
     if 'entity' in l:

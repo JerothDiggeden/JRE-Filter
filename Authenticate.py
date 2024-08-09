@@ -23,23 +23,23 @@ key_names = []
 keys1 = {}
 keys2 = {}
 
-# # GENERATE KEYS FOR EMPTY FILES
-#
-# i = 'admin'
-# key = Fernet.generate_key()
-# keys1[i] = key
-# key_names.append(i)
-# # Save the key to a file (optional)
-# with open("data/keys.pkl", "wb") as f:
-#     pickle.dump(keys1, f)
-#
-# i = 'admin'
-# key = Fernet.generate_key()
-# keys2[i] = key
-# key_names.append(i)
-# # Save the key to a file (optional)
-# with open("data/hashed_psswds.pkl", "wb") as f:
-#     pickle.dump(keys2, f)
+# GENERATE KEYS FOR EMPTY FILES
+
+i = 'admin'
+key = Fernet.generate_key()
+keys1[i] = key
+key_names.append(i)
+# Save the key to a file (optional)
+with open("data/keys.pkl", "wb") as f:
+    pickle.dump(keys1, f)
+
+i = 'admin'
+key = Fernet.generate_key()
+keys2[i] = key
+key_names.append(i)
+# Save the key to a file (optional)
+with open("data/hashed_psswds.pkl", "wb") as f:
+    pickle.dump(keys2, f)
 
 
 def hash_password(password):
@@ -93,8 +93,6 @@ def signup(username, password):
         except (pickle.UnpicklingError, EOFError, AttributeError, ValueError) as e:
             st.error(f"Error loading user data: {e}")
             user_data = {}
-    else:
-        user_data = {}
 
     if username in user_data:
         st.warning("Username already exists.")
@@ -107,9 +105,8 @@ def signup(username, password):
 
         with open("data/keys.pkl", "rb") as f:
             keys = pickle.load(f)
-        b = username
-        b = b.encode('utf-8')
-        if b not in keys:
+        if username not in keys:
+            keys = {}
             key = Fernet.generate_key()
             keys[username] = key
             key_names.append(username)
@@ -150,7 +147,8 @@ def login(username, password):
     username = username.strip()
     with open('data/hashed_psswds.pkl', 'rb') as f:
         user_data = pickle.load(f)
-        on_file = (user_data[username])
+        ic(user_data)
+        on_file = user_data[username]
     if username not in user_data:
         st.warning("Username not found.")
     elif check_password(password, on_file):
