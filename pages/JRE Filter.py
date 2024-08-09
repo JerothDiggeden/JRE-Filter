@@ -57,7 +57,6 @@ try:
             decrypted_data = decrypted_data.replace('b', '')
             decrypted_data = decrypted_data.split(',')
             keyword = decrypted_data
-        ic(decrypted_data)
 except KeyError:
     st.dialog('Please Login')
 
@@ -66,13 +65,13 @@ for episode in response:
     if 'entity' in episode:
         entity_data = episode['entity']['data']
         ep_code = entity_data.get('uri', '')
-        ic(ep_code)
         description = entity_data.get('description', '').split()
         for word in description:
             if word in keyword:
                 episodes_lst.append(ep_code)
                 episode_names.append(entity_data['name'])
                 descriptions.append(entity_data['description'])
+                break
         ic(episodes_lst)
 
 # EPISODE NAMES LIST

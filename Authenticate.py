@@ -25,21 +25,21 @@ keys2 = {}
 
 # GENERATE KEYS FOR EMPTY FILES
 
-i = 'admin'
-key = Fernet.generate_key()
-keys1[i] = key
-key_names.append(i)
-# Save the key to a file (optional)
-with open("data/keys.pkl", "wb") as f:
-    pickle.dump(keys1, f)
-
-i = 'admin'
-key = Fernet.generate_key()
-keys2[i] = key
-key_names.append(i)
-# Save the key to a file (optional)
-with open("data/hashed_psswds.pkl", "wb") as f:
-    pickle.dump(keys2, f)
+# i = 'admin'
+# key = Fernet.generate_key()
+# keys1[i] = key
+# key_names.append(i)
+# # Save the key to a file (optional)
+# with open("data/keys.pkl", "wb") as f:
+#     pickle.dump(keys1, f)
+#
+# i = 'admin'
+# key = Fernet.generate_key()
+# keys2[i] = key
+# key_names.append(i)
+# # Save the key to a file (optional)
+# with open("data/hashed_psswds.pkl", "wb") as f:
+#     pickle.dump(keys2, f)
 
 
 def hash_password(password):
@@ -147,7 +147,6 @@ def login(username, password):
     username = username.strip()
     with open('data/hashed_psswds.pkl', 'rb') as f:
         user_data = pickle.load(f)
-        ic(user_data)
         on_file = user_data[username]
     if username not in user_data:
         st.warning("Username not found.")
