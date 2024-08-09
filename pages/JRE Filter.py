@@ -58,7 +58,7 @@ try:
             decrypted_data = decrypted_data.split(',')
             keyword = decrypted_data
         ic(decrypted_data)
-except FileNotFoundError:
+except KeyError:
     st.dialog('Please Login')
 
 
@@ -66,29 +66,29 @@ for episode in response:
     if 'entity' in episode:
         entity_data = episode['entity']['data']
         ep_code = entity_data.get('uri', '')
+        ic(ep_code)
         description = entity_data.get('description', '').split()
         for word in description:
             if word in keyword:
                 episodes_lst.append(ep_code)
+                episode_names.append(entity_data['name'])
+                descriptions.append(entity_data['description'])
         ic(episodes_lst)
 
 # EPISODE NAMES LIST
 for uri in response:
     if 'entity' in uri:
-        count = 0
         if uri['entity']['_uri'] in episodes_lst:
             entity_data = uri['entity']['data']['description']
             episodes_dict[uri['entity']['data']['name']] = entity_data
-            episode_names.append(uri['entity']['data']['name'])
-            uri = uri
-        count += 1
+            # episode_names.append(uri['entity']['data']['name'])
 
 # DESCRIPTIONS LIST
-for k in response:
-    if 'entity' in k:
-        if k['entity']['_uri'] in episodes_lst:
-            descriptions.append(k['entity']['data']['description'])
-            ic(descriptions)
+# for k in response:
+#     if 'entity' in k:
+#         if k['entity']['_uri'] in episodes_lst:
+#             descriptions.append(k['entity']['data']['description'])
+#             ic(descriptions)
 
 for l in response:
     if 'entity' in l:
@@ -191,22 +191,47 @@ def clear():
     except FileNotFoundError:
         st.dialog('Please Login')
 
+
+def show_dialog():
+    st.session_state.show_dialog = True
+# Function to hide the dialog
+def hide_dialog():
+    st.session_state.show_dialog = False
+
 ep_links = []
 dec_filters = []
 
-with open("data/keys.pkl", "rb") as f:
-    keys = pickle.load(f)
-    key = keys[username]
-    cipher = Fernet(key)
-    with open(f"user_files/{username}/filter.txt", "rb") as f:
-        encrypted_data = f.read()
-        decrypted_data = cipher.decrypt(encrypted_data)
-        decrypted_data = decrypted_data.decode('utf-8')
-        decrypted_data = str(decrypted_data)
-        decrypted_data = decrypted_data.replace('b', '')
-        decrypted_data = decrypted_data.split(',')
-        for filter in decrypted_data:
-            dec_filters.append(filter)
+if "show_dialog" not in st.session_state:
+    st.session_state.show_dialog = False
+
+try:
+
+    with open("data/keys.pkl", "rb") as f:
+        keys = pickle.load(f)
+        key = keys[username]
+        cipher = Fernet(key)
+        with open(f"user_files/{username}/filter.txt", "rb") as f:
+            encrypted_data = f.read()
+            decrypted_data = cipher.decrypt(encrypted_data)
+            decrypted_data = decrypted_data.decode('utf-8')
+            decrypted_data = str(decrypted_data)
+            decrypted_data = decrypted_data.replace('b', '')
+            decrypted_data = decrypted_data.split(',')
+            for filter in decrypted_data:
+                dec_filters.append(filter)
+
+
+except KeyError:
+    st.session_state.show_dialog = True  # Set the flag to show the dialog
+    # Step 3: Display the dialog box conditionally
+    if st.session_state.show_dialog:
+        st.write("Dialog Box")
+        st.write("Please Sign-Up & Login!")
+
+        # "OK" button to hide the dialog
+        if st.button("OK"):
+            st.session_state.show_dialog = False
+            st.experimental_rerun()  # Rerun the script to refresh the UI
 
 
 # Using "with" notation
@@ -222,7 +247,10 @@ with st.sidebar:
     sub_txt = st.text_input(key='sub_txt', label='Remove Filter', placeholder='Enter a Filter Word to Remove',
                             on_change=sub)
     clear = st.button('Clear', key='clear', on_click=clear)
-    filter_lst = st.write(decrypted_data)
+    try:
+        filter_lst = st.write(decrypted_data)
+    except NameError:
+        st.dialog('Please Login')
 
 ic(episodes_lst)
 with col1:
@@ -236,7 +264,6 @@ with col1:
     except IndexError:
         print("Index Error")
 
-    st.title('')
     st.title('')
     st.title('Latest Episode: ')
     st.image(pic2, use_column_width=False)
@@ -257,6 +284,7 @@ with col1:
         print("Name Error")
 
     st.title('Old Episodes: ')
+    ic(episode_names)
     for i, link in enumerate(episodes_lst):
 
         html = f"https://open.spotify.com/episode/{link[16:]}?si=123e7de133124692&nd=1&dlsi=ad207e177da14244"
